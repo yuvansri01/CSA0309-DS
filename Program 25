@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct Edge {
+    int u, v, weight;
+};
+int compare(const void *a, const void *b) {
+    return ((struct Edge*)a)->weight - ((struct Edge*)b)->weight;
+}
+int find(int parent[], int i) {
+    if (parent[i] != i)
+        parent[i] = find(parent, parent[i]);
+    return parent[i];
+}
+void unionSet(int parent[], int x, int y) {
+    int xset = find(parent, x);
+    int yset = find(parent, y);
+    parent[xset] = yset;
+}
+void kruskalMST(int V, int E, struct Edge edges[]) {
+    qsort(edges, E, sizeof(edges[0]), compare); 
+    int parent[V];
+    for(int i = 0; i < V; i++) parent[i] = i;
+    printf("Edges in MST:\n");
+    int count = 0;
+    for(int i = 0; i < E && count < V-1; i++) {
+        int u = edges[i].u;
+        int v = edges[i].v;
+        int set_u = find(parent, u);
+        int set_v = find(parent, v);
+
+        if(set_u != set_v) { 
+            printf("%d - %d \tWeight: %d\n", u, v, edges[i].weight);
+            unionSet(parent, set_u, set_v);
+            count++;
+        }
+    }
+}
+
+int main() {
+    int V, E;
+    printf("Enter number of vertices: ");
+    scanf("%d", &V);
+    printf("Enter number of edges: ");
+    scanf("%d", &E);
+
+    struct Edge edges[E];
+    printf("Enter edges (u v weight):\n");
+    for(int i = 0; i < E; i++)
+        scanf("%d %d %d", &edges[i].u, &edges[i].v, &edges[i].weight);
+
+    kruskalMST(V, E, edges);
+    return 0;
+}
